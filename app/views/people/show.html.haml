@@ -47,6 +47,10 @@
   %i.icon-user
   add child
 |
+= link_to family_tree_person_path(@person) do
+  %i.icon-sitemap
+  view timeline
+|
 = link_to edit_person_path(@person) do
   %i.icon-edit
   edit

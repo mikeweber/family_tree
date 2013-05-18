@@ -9,13 +9,13 @@
       %span.lifespan
   
 .timeline_container
-  %canvas#timeline{ width: 6000, height: 2000 }
   .timeline
     - @baseline = 1450
     - @width_factor = 10
     :javascript
       var baseline     = #{@baseline},
           width_factor = #{@width_factor}
+    %canvas#timeline{ width: 6000, height: 2000 }
     .years
       - increment = 10
       - endline = 2050

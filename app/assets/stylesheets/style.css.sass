@@ -19,10 +19,19 @@ ul.people li
   top: 0
   left: 0
 
-.timeline
+.timeline  
+  width: 1200px
+  height: 900px
+  overflow: auto
+  
   .years
     height: 30px
+    display: block
+    width: 100%
     left: 0
+    z-index: 5
+    background: #FFF
+    border-bottom: 1px solid #000
     
     .year
       position: absolute
@@ -37,7 +46,7 @@ ul.people li
       border: 1px solid #555
       background: #EEE
       border-radius: 5px
-      transition: top 1s ease-in
+      transition: top 1s
       
       &.alive
         border-right-width: 0
@@ -46,6 +55,10 @@ ul.people li
       
       &.active
         box-shadow: 1px 1px 3px #000
+      
+      .show_parents
+        text-decoration: none
+        color: #0A0
       
       .details
         padding: 2px 5px

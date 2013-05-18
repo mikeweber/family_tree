@@ -1,8 +1,10 @@
 $ ->
+  window.onresize = takeoverWindow
+  takeoverWindow()
   repositionRoot()
-  redrawFamilyTree()
-  drawTransitionalLines()
+  animateFamilyConnections(1000)
   hideTreeLinks()
+  repositionWindow()
   
   $('.timeline').on 'mouseenter', '.person', makeActive
   $('.timeline').on 'mouseleave', '.person', removeActive
@@ -12,6 +14,15 @@ $ ->
     person = $(this).parents('.person')
     $.getJSON $(this).attr('href'), {}, (response) ->
       renderParents(response.mother, response.father, person)
+
+takeoverWindow = ->
+  $('.timeline').css('width', $(window).width()).css('height', $(window).height() - 100)
+
+repositionWindow = ->
+  min_left = Math.min.apply null, $('.person').map ->
+    $(this).offset().left
+  
+  $('.timeline').scrollLeft(min_left - 100)
 
 makeActive = ->
   $this = $(this)
@@ -26,19 +37,22 @@ removeActive = ->
 renderParents = (mother, father, child) ->
   renderPerson(mother, child) if mother
   renderPerson(father, child) if father
-  drawTransitionalLines()
+  repositionRoot()
   hideTreeLinks()
+  animateFamilyConnections(1000)
 
-drawTransitionalLines = ->
-  render_count = 0
-  renderingLoop = ->
-    return if render_count >= 100
-    
-    render_count++
-    repositionRoot()
-    setTimeout renderingLoop, 10
+animateFamilyConnections = (duration) ->
+  start = new Date().getTime()
+  end = start + duration
   
-  renderingLoop()
+  step = ->
+    timestamp = new Date().getTime()
+    progress = Math.min((duration - (end - timestamp)) / duration, 1)
+    redrawFamilyTree()
+    
+    requestAnimationFrame(step) if (progress < 1)
+  
+  step()
 
 renderPerson = (person, added_from) ->
   person.has_parent = person.mother_id or person.father_id
@@ -47,7 +61,7 @@ renderPerson = (person, added_from) ->
   
   new_person = $("##{person.id}")
   new_person.hide()
-  new_person.css('top', added_from.position().top) if added_from.length > 0
+  new_person.css('top', $('.timeline').scrollTop() + added_from.position().top) if added_from.length > 0
   new_person.addClass('alive') unless person.died?
   new_person.css('left', (person.born_year - baseline) * width_factor)
   end_year = person.died_year or (new Date()).getFullYear()
@@ -63,7 +77,6 @@ lifespan = (born, died) ->
 
 repositionRoot = ->
   repositionPerson $('.person.root'), 20
-  redrawFamilyTree()
 
 redrawFamilyTree = ->
   canvas = $('#timeline')[0]
@@ -88,9 +101,9 @@ repositionPerson = (person, base) ->
 
 connectToParents = (person, ctx) ->
   $person = $(person)
-  born = $person.offset().left
-  top = $person.position().top
-  bottom = top + $person.height()
+  born = $('.timeline').scrollLeft() + $person.offset().left
+  top =  $('.timeline').scrollTop() + $person.position().top
+  bottom = top + $person.outerHeight()
   
   if (mother = $("##{$person.data('mother-id')}")).length > 0
     connectToPerson(mother, born, top, bottom, ctx)
@@ -99,15 +112,28 @@ connectToParents = (person, ctx) ->
     connectToPerson(father, born, top, bottom, ctx)
 
 connectToPerson = (target_person, left, top, bottom, ctx) ->
-  target_top = target_person.position().top
-  target_bottom = target_top + target_person.height()
-  target_above = top > target_top
+  target_top      = $('.timeline').scrollTop() + target_person.position().top
+  target_bottom   = target_top + target_person.outerHeight()
+  target_above    = top > target_top
   ctx.beginPath()
   ctx.moveTo(left, (if target_above then top else bottom))
-  connect_to = if target_above then target_bottom else target_top
-  ctx.lineTo(left, connect_to)
+  connect_to_top  = if target_above then target_bottom else target_top
+  connect_to_left = left - width_factor * (3 / 4)
+  ctx.lineTo(connect_to_left, connect_to_top)
   ctx.stroke()
-  drawArrowHead(ctx, left, connect_to, 270, target_above)
+  
+  x = 0
+  y = 0
+  if target_above
+    x = left - connect_to_left
+    y = top - connect_to_top
+  else
+    x = left - connect_to_left
+    y = bottom - connect_to_top
+  
+  radians = Math.atan2 y, x
+  
+  drawArrowHead(ctx, connect_to_left, connect_to_top, radians, false, 10)
 
 hideTreeLinks = ->
   for person in $('.timeline .person')
@@ -117,19 +143,19 @@ hideTreeLinks = ->
     if mother.length > 0 or father.length > 0
       $(person).find('.show_parents').remove()
 
-drawArrowHead = (ctx, x, y, angle_from_horizontal_degrees, upside, barb_length, barb_angle_degrees, filled) ->
+drawArrowHead = (ctx, x, y, angle_from_horizontal_radians, upside, barb_length, barb_angle_radians, filled) ->
   barb_length = 8 unless barb_length?
-  barb_angle_degrees = 20 unless barb_angle_degrees?
+  barb_angle_radians = 0.349 unless barb_angle_radians?
   filled = true unless filled?
-  alpha_degrees = (if upside then -1 else 1) * angle_from_horizontal_degrees
+  alpha_radians = (if upside then -1 else 1) * angle_from_horizontal_radians
   
   # first point is end of one barb
-  plus = degToRad(alpha_degrees - barb_angle_degrees)
+  plus = alpha_radians - barb_angle_radians
   a = x + (barb_length * Math.cos(plus))
   b = y + (barb_length * Math.sin(plus))
   
   # final point is end of the second barb
-  minus = degToRad(alpha_degrees + barb_angle_degrees)
+  minus = alpha_radians + barb_angle_radians
   c = x + (barb_length * Math.cos(minus))
   d = y + (barb_length * Math.sin(minus))
   
@@ -141,5 +167,11 @@ drawArrowHead = (ctx, x, y, angle_from_horizontal_degrees, upside, barb_length, 
   
   return true
 
-degToRad = (angle_degrees) ->
-   angle_degrees / 180 * Math.PI
+requestAnimationFrame =
+  window.requestAnimationFrame or
+  window.webkitRequestAnimationFrame or
+  window.mozRequestAnimationFrame or
+  window.msRequestAnimationFrame or
+  window.oRequestAnimationFrame or
+  (callback) ->
+    setTimeout(callback, 1)
