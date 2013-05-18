@@ -1,11 +1,10 @@
 source 'https://rubygems.org'
 
 gem 'rails', '3.2.13'
-
+gem "mongo_mapper"
+gem 'haml-rails'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
-
-
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -17,6 +16,11 @@ group :assets do
   # gem 'therubyracer', :platforms => :ruby
 
   gem 'uglifier', '>= 1.0.3'
+end
+
+group :development, :test do
+  gem 'awesome_print'
+  gem 'better_errors'
 end
 
 gem 'jquery-rails'
@@ -34,4 +38,4 @@ gem 'jquery-rails'
 # gem 'capistrano'
 
 # To use debugger
-# gem 'debugger'
+gem 'debugger'

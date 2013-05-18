@@ -1,0 +1,42 @@
+- if @person.errors.present?
+  %ul.errors
+    - @person.errors.full_messages do |msg|
+      %li= msg
+
+= form_for @person do |f|
+  = f.label :title
+  = f.text_field :title
+  
+  = f.label :suffix
+  = f.text_field :suffix
+  
+  = f.label :first_name
+  = f.text_field :first_name, autofocus: true
+  
+  = f.label :last_name
+  = f.text_field :last_name
+  
+  = f.label :born_on
+  = f.text_field :born_on
+  
+  = f.label :died_on
+  = f.text_field :died_on
+  
+  = f.label :gender
+  = f.select :gender, [[''], ['male'], ['female']]
+  
+  = f.label :mother_id
+  = f.select :mother_id, @women.collect { |person| ["#{person.full_name} - #{person.born}", person.id] }, include_blank: true
+  
+  = f.label :father_id
+  = f.select :father_id, @men.collect { |person| ["#{person.full_name} - #{person.born}", person.id] }, include_blank: true
+  
+  = f.label :bio
+  = f.text_area :bio, cols: 100, rows: 5
+  
+  %br
+  %button.btn.btn-success.btn-info
+    %i.icon-save
+    Save
+  |
+  = link_to 'cancel', people_path

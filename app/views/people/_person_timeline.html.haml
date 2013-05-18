@@ -1,0 +1,7 @@
+.person{ id: person.id, class: [('alive' if person.died.blank?), ('root' if root)].compact.join(' '), data: { mother_id: person.mother_id, father_id: person.father_id }, style: "left: #{(person.born_year - @baseline) * @width_factor}px; width: #{((person.died_year || Date.today.year) - person.born_year) * @width_factor}px" }
+  .details
+    - if person.mother_id || person.father_id
+      = link_to family_tree_person_path(person), class: 'show_parents' do
+        %i.icon-sitemap
+    = link_to person.full_name, person_path(person)
+    %span.lifespan== (#{lifespan(person.born, person.died)})

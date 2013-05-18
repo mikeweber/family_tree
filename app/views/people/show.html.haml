@@ -1,0 +1,56 @@
+= render partial: 'person', locals: { person: @person }
+%dl
+  %dt Mother
+  %dd
+    - if @person.mother
+      = link_to person_path(@person.mother) do
+        %i.icon-user
+        = @person.mother.full_name
+    - else
+      = link_to new_person_path do
+        %i.icon-add
+        %i.icon-user
+        Add mother
+  
+  %dt Father
+  %dd
+    - if @person.father
+      = link_to person_path(@person.father) do
+        %i.icon-user
+        = @person.father.full_name
+    - else
+      = link_to new_person_path do
+        %i.icon-add
+        %i.icon-user
+        Add father
+  
+  %dt Children
+  %dd
+    %ol
+      - if @children.empty?
+        %li.none None
+      - @children.each do |child|
+        %li
+          = link_to person_path(child) do
+            %i.icon-user
+            = child.full_name
+            == (#{lifespan(child.born, child.died)})
+
+%br
+= link_to new_person_path do
+  %i.icon-plus
+  %i.icon-user
+  add person
+|
+= link_to new_person_path(person: { "#{@person.gender == 'male' ? :father : :mother}_id" => @person }) do
+  %i.icon-plus
+  %i.icon-user
+  add child
+|
+= link_to edit_person_path(@person) do
+  %i.icon-edit
+  edit
+|
+= link_to people_path do
+  %i.icon-list
+  back to list

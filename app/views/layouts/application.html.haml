@@ -1,0 +1,15 @@
+!!! 5
+%html
+  %head
+    %title Young family tree
+    = stylesheet_link_tag "application", :media => "all"
+    = stylesheet_link_tag "//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css"
+    = stylesheet_link_tag "//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css"
+    = csrf_meta_tags
+  
+  %body
+    = render partial: 'layouts/header'
+    .container= yield
+    
+    = javascript_include_tag '//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js'
+    = javascript_include_tag "application"

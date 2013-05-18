@@ -1,0 +1,10 @@
+%header.navbar.navbar-inverse
+  .navbar-inner
+    .container
+      %h1.title Young family tree
+      %nav.nav
+        %li= link_to "Family Members", people_path
+        %li
+          = link_to timeline_people_path do
+            %i.icon-time
+            Timeline

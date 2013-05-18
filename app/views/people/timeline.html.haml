@@ -1,0 +1,27 @@
+%script#person_template{ type: 'text/mustache' }
+  .person{ id: '{{id}}', data: { mother_id: '{{mother_id}}', father_id: '{{father_id}}' } }
+    .details
+      {{#has_parent}}
+      %a.show_parents{ href: '/people/{{id}}/family_tree' }
+        %i.icon-sitemap
+      {{/has_parent}}
+      %a{ href: '/people/{{id}}' } {{full_name}}
+      %span.lifespan
+  
+.timeline_container
+  %canvas#timeline{ width: 6000, height: 2000 }
+  .timeline
+    - @baseline = 1450
+    - @width_factor = 10
+    :javascript
+      var baseline     = #{@baseline},
+          width_factor = #{@width_factor}
+    .years
+      - increment = 10
+      - endline = 2050
+      - ((endline - @baseline) / increment).times do |i|
+        - year = @baseline + i * increment
+        .year{ style: "left: #{i * 100}px" }= year
+    .people
+      - @people.each.with_index do |person, i|
+        = render partial: 'person_timeline', locals: { person: person, root: (i == 0) }
