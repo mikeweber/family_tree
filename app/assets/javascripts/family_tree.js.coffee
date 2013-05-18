@@ -1,39 +1,59 @@
 $ ->
   repositionRoot()
   redrawFamilyTree()
+  drawTransitionalLines()
+  hideTreeLinks()
   
-  $('.person').hover makeActive, removeActive
+  $('.timeline').on 'mouseenter', '.person', makeActive
+  $('.timeline').on 'mouseleave', '.person', removeActive
   $('.timeline').on 'click', '.show_parents', (event) ->
     event.preventDefault()
     
-    person_id = $(this).attr('id')
-    $.getJSON $(this).attr('href'), {}, renderParents
-    return false
+    person = $(this).parents('.person')
+    $.getJSON $(this).attr('href'), {}, (response) ->
+      renderParents(response.mother, response.father, person)
 
 makeActive = ->
   $this = $(this)
   $this.addClass('active')
-  $("##{$this.data('mother-id')}, ##{$this.data('father-id')}").addClass('active')
+  
+  $("##{$this.data('mother-id')}").addClass('active') if $this.data('mother-id')
+  $("##{$this.data('father-id')}").addClass('active') if $this.data('father-id')
 
 removeActive = ->
   $('.person').removeClass('active')
 
-renderParents = (response) ->
-  renderPerson(response.mother) if response.mother
-  renderPerson(response.father) if response.father
-  repositionRoot()
+renderParents = (mother, father, child) ->
+  renderPerson(mother, child) if mother
+  renderPerson(father, child) if father
+  drawTransitionalLines()
+  hideTreeLinks()
 
-renderPerson = (person) ->
+drawTransitionalLines = ->
+  render_count = 0
+  renderingLoop = ->
+    return if render_count >= 100
+    
+    render_count++
+    repositionRoot()
+    setTimeout renderingLoop, 10
+  
+  renderingLoop()
+
+renderPerson = (person, added_from) ->
   person.has_parent = person.mother_id or person.father_id
   person.full_name = "#{person.first_name} #{person.last_name}"
   $('.timeline .people').append Mustache.render($('#person_template').html(), person)
   
   new_person = $("##{person.id}")
+  new_person.hide()
+  new_person.css('top', added_from.position().top) if added_from.length > 0
   new_person.addClass('alive') unless person.died?
   new_person.css('left', (person.born_year - baseline) * width_factor)
   end_year = person.died_year or (new Date()).getFullYear()
   new_person.css('width', (end_year - person.born_year) * width_factor)
   new_person.find('.lifespan').html("(#{lifespan(person.born, person.died)})")
+  new_person.show()
 
 lifespan = (born, died) ->
   span = "#{born}"
@@ -42,7 +62,7 @@ lifespan = (born, died) ->
   return span
 
 repositionRoot = ->
-  repositionPerson $('.person.root'), 0
+  repositionPerson $('.person.root'), 20
   redrawFamilyTree()
 
 redrawFamilyTree = ->
@@ -55,11 +75,16 @@ repositionPerson = (person, base) ->
   $person = $(person)
   return base if $person.length == 0
   
-  father_bottom = repositionPerson($("##{$person.data('father-id')}"), base)
-  $person.css(top: father_bottom + 20)
-  mother_bottom = repositionPerson($("##{$person.data('mother-id')}"), father_bottom + 30)
+  new_base = base
   
-  return mother_bottom + 20
+  if father = $("##{$person.data('father-id')}")
+    new_base = repositionPerson(father, new_base)
+  new_base = new_base + 20
+  $person.css(top: new_base)
+  if mother = $("##{$person.data('mother-id')}")
+    new_base = repositionPerson(mother, new_base + 20)
+  
+  return new_base
 
 connectToParents = (person, ctx) ->
   $person = $(person)
@@ -83,6 +108,14 @@ connectToPerson = (target_person, left, top, bottom, ctx) ->
   ctx.lineTo(left, connect_to)
   ctx.stroke()
   drawArrowHead(ctx, left, connect_to, 270, target_above)
+
+hideTreeLinks = ->
+  for person in $('.timeline .person')
+    mother = $("##{$(person).data('mother-id')}")
+    father = $("##{$(person).data('father-id')}")
+    
+    if mother.length > 0 or father.length > 0
+      $(person).find('.show_parents').remove()
 
 drawArrowHead = (ctx, x, y, angle_from_horizontal_degrees, upside, barb_length, barb_angle_degrees, filled) ->
   barb_length = 8 unless barb_length?

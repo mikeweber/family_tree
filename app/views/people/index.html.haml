@@ -12,6 +12,8 @@
         %i.icon-edit
       = link_to person_path(person) do
         %i.icon-search
+      = link_to family_tree_person_path(person) do
+        %i.icon-sitemap
       = link_to person_path(person), method: :delete, confirm: "Are you sure you want to remove #{person.full_name}?" do
         %i.icon-remove
       = render partial: 'person', locals: { person: person }
