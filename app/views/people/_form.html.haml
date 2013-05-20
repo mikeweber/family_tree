@@ -31,6 +31,9 @@
   = f.label :father_id
   = f.select :father_id, @men.collect { |person| ["#{person.full_name} - #{person.born}", person.id] }, include_blank: true
   
+  = f.label :ethnicity
+  = f.text_field :ethnicity
+  
   = f.label :bio
   = f.text_area :bio, cols: 100, rows: 5
   

@@ -15,6 +15,7 @@ class Person
   key :location_died, Location
   key :bio, String
   key :gender, String
+  key :ethnicity, String
   
   key :father_id, ObjectId
   belongs_to :father, class_name: 'Person'

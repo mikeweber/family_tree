@@ -35,6 +35,9 @@
             %i.icon-user
             = child.full_name
             == (#{lifespan(child.born, child.died)})
+  
+  %dt Ethnicity
+  %dd= @person.ethnicity
 
 %br
 = link_to new_person_path do
