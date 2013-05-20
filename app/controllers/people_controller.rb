@@ -6,7 +6,7 @@ class PeopleController < ApplicationController
   end
   
   def timeline
-    @people = Person.order(born_year: :desc, born_month: :desc)
+    @people = Person.order(born_year: :desc, born_month: :desc).all
     render layout: 'timeline'
   end
   

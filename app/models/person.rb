@@ -65,7 +65,7 @@ class Person
   end
   
   def as_json(options = nil)
-    super(methods: [:born, :died])
+    super(methods: [:born, :died, :full_name])
   end
   
   private

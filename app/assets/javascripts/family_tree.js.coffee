@@ -56,7 +56,6 @@ animateFamilyConnections = (duration) ->
 
 renderPerson = (person, added_from) ->
   person.has_parent = person.mother_id or person.father_id
-  person.full_name = "#{person.first_name} #{person.last_name}"
   $('.timeline .people').append Mustache.render($('#person_template').html(), person)
   
   new_person = $("##{person.id}")
