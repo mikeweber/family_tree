@@ -69,6 +69,24 @@ class Person
     super(methods: [:born, :died, :full_name])
   end
   
+  # def full_ethnicity
+  #   return { self.ethnicity => 100 } if self.ethnicity
+  #   mother_ethnicity = self.mother ? self.mother.full_ethnicity : {}
+  #   father_ethnicity = self.father ? self.father.full_ethnicity : {}
+  #   
+  #   self_ethnicity = {}
+  #   mother_ethnicity.each do |name, percent|
+  #     self_ethnicity[name] = percent * 0.5 + father_ethnicity[name].to_f * 0.5
+  #   end
+  #   father_ethnicity.each do |name, percent|
+  #     next if self_ethnicity.has_key?(name)
+  #     
+  #     self_ethnicity[name] = percent * 0.5
+  #   end
+  #   
+  #   return self_ethnicity.sort_by { |a, b| a[1] <=> b[1] }
+  # end
+  
   private
   
   def split_date(date)

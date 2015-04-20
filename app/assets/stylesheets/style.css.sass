@@ -4,10 +4,10 @@ h1.title
 
 ul.people li
   clear: left
-  
+
   a:hover
     text-decoration: none
-  
+
   dt, dd
     float: left
 
@@ -19,11 +19,11 @@ ul.people li
   top: 0
   left: 0
 
-.timeline  
+.timeline
   width: 1200px
   height: 900px
   overflow: auto
-  
+
   .years
     height: 30px
     display: block
@@ -31,39 +31,49 @@ ul.people li
     left: 0
     z-index: 5
     background: #FFF
-    
+
     .year
       position: absolute
       border-left: 1px solid #000
       height: inherit
-  
+
   .people
     left: 0
-    
+
     .person
       position: absolute
       border: 1px solid #555
       background: #EEE
       border-radius: 5px
       transition: top 1s
-      
+
+      a
+        color: white
+
+      &.male
+        background: #88F
+
+      &.female
+        background: #DDA0DD
+
       &.alive
         border-right-width: 0
         border-top-right-radius: 0
         border-bottom-right-radius: 0
-      
+
       &.active
         box-shadow: 1px 1px 3px #000
-      
+
       .show_parents
         text-decoration: none
-        color: #0A0
-      
+        color: #060
+
       .details
         padding: 2px 5px
-      
+
       .lifespan
         float: right
-      
+
       &:hover
         z-index: 1
+

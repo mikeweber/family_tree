@@ -61,16 +61,20 @@ renderPerson = (person, added_from) ->
   new_person = $("##{person.id}")
   new_person.hide()
   new_person.css('top', $('.timeline').scrollTop() + added_from.position().top) if added_from.length > 0
-  new_person.addClass('alive') unless person.died?
+  new_person.addClass('alive') unless person_is_dead(person.died)
+  new_person.addClass(person.gender)
   new_person.css('left', (person.born_year - baseline) * width_factor)
   end_year = person.died_year or (new Date()).getFullYear()
   new_person.css('width', (end_year - person.born_year) * width_factor)
   new_person.find('.lifespan').html("(#{lifespan(person.born, person.died)})")
   new_person.show()
 
+person_is_dead = (died) ->
+  return died != ''
+
 lifespan = (born, died) ->
   span = "#{born}"
-  span = "#{span} - #{died}" if died?
+  span = "#{span} - #{died}" if person_is_dead(died)
   
   return span
 
@@ -114,6 +118,8 @@ connectToPerson = (target_person, left, top, bottom, ctx) ->
   target_top      = $('.timeline').scrollTop() + target_person.position().top
   target_bottom   = target_top + target_person.outerHeight()
   target_above    = top > target_top
+  ctx.strokeStyle = '#000'
+  ctx.lineWidth = 2
   ctx.beginPath()
   ctx.moveTo(left, (if target_above then top else bottom))
   connect_to_top  = if target_above then target_bottom else target_top

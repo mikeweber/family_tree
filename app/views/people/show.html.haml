@@ -37,7 +37,13 @@
             == (#{lifespan(child.born, child.died)})
   
   %dt Ethnicity
-  %dd= @person.ethnicity
+  -# %dd
+  -#   - if @person.full_ethnicity.blank?
+  -#     Unknown
+  -#   - @person.full_ethnicity.each do |name, percent|
+  -#     %li
+  -#       = name
+  -#       = "(#{percent.round(2)}%)"
 
 %br
 = link_to new_person_path do
